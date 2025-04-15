@@ -22,20 +22,14 @@ jobs:
       should_build: ${{ steps.should_build.outputs.should_build }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-    - name: Get latest version info
+    - name: Set specific version info
       id: version_info
       run: |
-        data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/latest)
-        LATEST_TAG=$(echo "${data}" | jq -r '.tag_name')
-        DOWNLOAD_URL=$(echo "${data}" | jq -r '.assets[].browser_download_url')
-        VERSION_INFO=$(echo "${data}" | jq -r '.body')
-
-        echo "${LATEST_TAG}" > ${LATEST_TAG}.txt
+        LATEST_TAG="v1.3.13"
+        DOWNLOAD_URL="https://github.com/aseprite/aseprite/archive/refs/tags/${LATEST_TAG}.zip"
+    
         echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
         echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
-        echo "version_info<<EOF" >> $GITHUB_OUTPUT
-        echo "$VERSION_INFO" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
     - name: Load version from cache
       id: version_check
       uses: actions/cache@v3
@@ -44,7 +38,6 @@ jobs:
         key: cached_version
     - name: Should we start new build?
       id: should_build
-      if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/fix' || steps.version_check.outputs.cache-hit != 'true'
       run: echo "should_build=true" >> $GITHUB_OUTPUT
     - name: Create Release
       id: create_release
