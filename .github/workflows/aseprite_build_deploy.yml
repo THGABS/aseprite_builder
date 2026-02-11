@@ -67,7 +67,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
        matrix:
-         os: [windows-latest]
+         os: [windows-latest, ubuntu-latest]
        fail-fast: false
     steps:
       - name: (Windows) Install dependencies
@@ -123,10 +123,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         working-directory: aseprite/build
         shell: pwsh
-        run: |
-          $nproc = (Get-CimInstance Win32_Processor).NumberOfLogicalProcessors
-          echo "Number of logical processors: $nproc"
-          ninja aseprite -j $nproc
+        run: ninja aseprite -j $env:NUMBER_OF_PROCESSORS
       - name: (Ubuntu) Run Ninja
         if: matrix.os == 'ubuntu-latest'
         working-directory: aseprite/build
