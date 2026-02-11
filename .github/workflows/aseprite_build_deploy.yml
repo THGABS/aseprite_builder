@@ -119,22 +119,36 @@ jobs:
         if: matrix.os == 'macOS-latest'
         working-directory: aseprite/build
         run: cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -DLAF_BACKEND=skia -DSKIA_DIR=$(realpath ../../skia) -DSKIA_LIBRARY_DIR=$(realpath ../../skia/out/Release-x64) -G Ninja ..
-      - name: (Windows/macOS) Run Ninja
-        if: matrix.os != 'ubuntu-latest'
+      - name: (Windows) Run Ninja
+        if: matrix.os == 'windows-latest'
         working-directory: aseprite/build
-        run: ninja aseprite
+        shell: pwsh
+        run: ninja aseprite -j$env:NUMBER_OF_PROCESSORS
       - name: (Ubuntu) Run Ninja
         if: matrix.os == 'ubuntu-latest'
         working-directory: aseprite/build
         run: ninja aseprite -j$(nproc)
+      - name: (macOS) Run Ninja
+        if: matrix.os == 'macOS-latest'
+        working-directory: aseprite/build
+        run: ninja aseprite -j$(sysctl -n hw.logicalcpu)
       - name: Clean up build
         working-directory: aseprite/build/bin
         shell: bash
         run: rm -f gen modp_b64_gen gen.exe gen.exe.manifest modp_b64_gen.exe modp_b64_gen.exe.manifest
-      - name: (Windows) Make portable zip
+      - name: (Windows) Get libcrypto-1_1-x64.dll
+        if: matrix.os == 'windows-latest'
+        working-directory: aseprite/build/bin
+        run: curl -L -o libcrypto-1_1-x64.dll https://raw.githubusercontent.com/WenqiOfficial/aseprite_builder/master/libcrypto-1_1-x64.dll
+      - name: Checkout aseprite/strings
+        uses: actions/checkout@v4
+        with:
+          repository: aseprite/strings
+          path: aseprite/build/bin/data/strings
+      - name: Make aseprite.ini
         working-directory: aseprite/build/bin
         run: echo '# This file is here so Aseprite behaves as a portable program' > aseprite.ini
-      - name: Create release
+      - name: Make portable zip
         working-directory: aseprite/build/bin
         run: 7z -tzip a Aseprite-${{ needs.check-version.outputs.latest_tag }}-${{ runner.os }}.zip *
       - name: Upload release
