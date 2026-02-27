@@ -144,7 +144,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aseprite/strings
-          path: aseprite/build/bin/data/strings
+          path: aseprite/strings
+      - name: Add strings to data directory
+        run: |
+          mkdir -p aseprite/build/bin/data/strings
+          cp -rn aseprite/strings/* aseprite/build/bin/data/strings
       - name: Make aseprite.ini
         working-directory: aseprite/build/bin
         run: echo '# This file is here so Aseprite behaves as a portable program' > aseprite.ini
