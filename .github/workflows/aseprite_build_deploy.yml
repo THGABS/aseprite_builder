@@ -75,7 +75,7 @@ jobs:
         uses: seanmiddleditch/gha-setup-ninja@v6
       - name: (Windows) Remove OpenSLL from PATH
         if: matrix.os == 'windows-latest'
-        shell: powershell
+        shell: pwsh
         run: Remove-Item -Recurse -Force "C:\Program Files\OpenSSL\"
       - name: (Ubuntu) Install dependencies
         if: matrix.os == 'ubuntu-latest'
@@ -145,11 +145,8 @@ jobs:
         with:
           repository: aseprite/strings
           path: aseprite/strings
-      - name: (Windows) Add strings to data directory
-        if: matrix.os == 'windows-latest'
-        run: Copy-Item aseprite/strings/*.ini -Destination aseprite/build/bin/data/strings -Exclude en.ini
-      - name: (Ubuntu) Add strings to data directory
-        if: matrix.os == 'ubuntu-latest'
+      - name: Add strings to data directory
+        shell: bash
         run: cp -rn aseprite/strings/*.ini aseprite/build/bin/data/strings
       - name: Make aseprite.ini
         working-directory: aseprite/build/bin
