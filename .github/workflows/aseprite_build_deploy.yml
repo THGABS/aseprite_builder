@@ -145,8 +145,12 @@ jobs:
         with:
           repository: aseprite/strings
           path: aseprite/strings
-      - name: Add strings to data directory
-        run: cp -rn aseprite/strings/* aseprite/build/bin/data/strings
+      - name: (Windows) Add strings to data directory
+        if: matrix.os == 'windows-latest'
+        run: Copy-Item aseprite/strings/*.ini -Destination aseprite/build/bin/data/strings -Exclude en.ini
+      - name: (Ubuntu) Add strings to data directory
+        if: matrix.os == 'ubuntu-latest'
+        run: cp -rn aseprite/strings/*.ini aseprite/build/bin/data/strings
       - name: Make aseprite.ini
         working-directory: aseprite/build/bin
         run: echo '# This file is here so Aseprite behaves as a portable program' > aseprite.ini
