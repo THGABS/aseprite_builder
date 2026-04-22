@@ -147,7 +147,9 @@ jobs:
           path: aseprite/strings
       - name: Add strings to data directory
         run: |
-          mkdir -p aseprite/build/bin/data/strings
+          if [ ! -d "aseprite/build/bin/data/strings" ];then
+            mkdir -p aseprite/build/bin/data/strings
+          fi
           cp -rn aseprite/strings/* aseprite/build/bin/data/strings
       - name: Make aseprite.ini
         working-directory: aseprite/build/bin
