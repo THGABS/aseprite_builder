@@ -146,11 +146,7 @@ jobs:
           repository: aseprite/strings
           path: aseprite/strings
       - name: Add strings to data directory
-        run: |
-          if [ ! -d "aseprite/build/bin/data/strings" ];then
-            mkdir -p aseprite/build/bin/data/strings
-          fi
-          cp -rn aseprite/strings/* aseprite/build/bin/data/strings
+        run: cp -rn aseprite/strings/* aseprite/build/bin/data/strings
       - name: Make aseprite.ini
         working-directory: aseprite/build/bin
         run: echo '# This file is here so Aseprite behaves as a portable program' > aseprite.ini
